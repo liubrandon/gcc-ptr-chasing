@@ -1541,7 +1541,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-      __node_base* __prev_p = _M_buckets[__n];
+	    printf("hacked before node\n");
+      		fflush(stdout);
+	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
 	return nullptr;
 

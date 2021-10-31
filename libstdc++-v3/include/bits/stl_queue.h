@@ -465,7 +465,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       priority_queue(const _Compare& __x = _Compare(),
 		     const _Sequence& __s = _Sequence())
       : c(__s), comp(__x)
-      { std::make_heap(c.begin(), c.end(), comp); }
+      {
+	      std::make_heap(c.begin(), c.end(), comp); 
+      }
 #else
       template<typename _Seq = _Sequence, typename _Requires = typename
 	       enable_if<__and_<is_default_constructible<_Compare>,

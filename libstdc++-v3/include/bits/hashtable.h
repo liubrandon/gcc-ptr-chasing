@@ -33,6 +33,8 @@
 #pragma GCC system_header
 
 #include <bits/hashtable_policy.h>
+#include "../../../../pc/api/test.h"
+//#include "../../../../pc/api/chase.h"
 #if __cplusplus > 201402L
 # include <bits/node_handle.h>
 #endif
@@ -166,7 +168,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    *    - __detail::_Rehash_base
    *    - __detail::_Equality
    */
-  template<typename _Key, typename _Value, typename _Alloc,
+
+
+    	template<typename _Key, typename _Value, typename _Alloc,
 	   typename _ExtractKey, typename _Equal,
 	   typename _H1, typename _H2, typename _Hash,
 	   typename _RehashPolicy, typename _Traits>
@@ -1541,7 +1545,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-	    printf("hacked before node\n");
+	    print_test();
+	    printf("__code as int   : %d\n", __code);
+	    printf("__k as    int   : %d\n", __k);
       		fflush(stdout);
 	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)

@@ -32,9 +32,8 @@
 
 #pragma GCC system_header
 
+#include "/home/user/stdlibc++/pc/api/chase.h"
 #include <bits/hashtable_policy.h>
-#include "../../../../pc/api/test.h"
-//#include "../../../../pc/api/chase.h"
 #if __cplusplus > 201402L
 # include <bits/node_handle.h>
 #endif
@@ -161,7 +160,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    *  Pattern" (CRTP) technique, but uses a reconstructed, not
    *  explicitly passed, template pattern.
    *
-   *  Base class templates are: 
+   *  Base class templates are:
    *    - __detail::_Hashtable_base
    *    - __detail::_Map_base
    *    - __detail::_Insert
@@ -1395,7 +1394,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	{
 	  __x._M_buckets = _M_buckets;
 	  _M_buckets = &_M_single_bucket;
-	}	
+	}
       else
 	std::swap(_M_buckets, __x._M_buckets);
 
@@ -1532,6 +1531,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	return std::make_pair(end(), end());
     }
 
+/*  void* next_func(void* ptr) {
+  	return static_cast<__node_type*>(ptr)->_M_next();
+  }
+
+  bool end_func(void* ptr) {
+  	if(_M_equals(__k, __code, __p)
+  }*/
+
   // Find the node whose key compares equal to k in the bucket n.
   // Return nullptr if no node is found.
   template<typename _Key, typename _Value,
@@ -1545,7 +1552,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-	    print_test();
 	    printf("__code as int   : %d\n", __code);
 	    printf("__k as    int   : %d\n", __k);
       		fflush(stdout);
@@ -2037,6 +2043,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
     clear() noexcept
     {
+      printf("hacked clear\n");
+      fflush(stdout);
       this->_M_deallocate_nodes(_M_begin());
       __builtin_memset(_M_buckets, 0, _M_bucket_count * sizeof(__bucket_type));
       _M_element_count = 0;

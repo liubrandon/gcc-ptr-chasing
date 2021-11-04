@@ -847,7 +847,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       insert(const_iterator __hint, const value_type& __v)
       {
 	__hashtable& __h = _M_conjure_hashtable();
-	__node_gen_type __node_gen(__h);	
+	__node_gen_type __node_gen(__h);
 	return __h._M_insert(__hint, __v, __node_gen, __unique_keys());
       }
 
@@ -2010,7 +2010,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       using __value_alloc_traits = std::allocator_traits<__value_alloc_type>;
 
       using __node_base = __detail::_Hash_node_base;
-      using __bucket_type = __node_base*;      
+      using __bucket_type = __node_base*;
       using __bucket_alloc_type =
 	__alloc_rebind<__node_alloc_type, __bucket_type>;
       using __bucket_alloc_traits = std::allocator_traits<__bucket_alloc_type>;
@@ -2090,6 +2090,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     void
     _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes(__node_type* __n)
     {
+      printf("hacked dealloc nodes\n");
+      fflush(stdout);
       while (__n)
 	{
 	  __node_type* __tmp = __n;

@@ -2037,6 +2037,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	__node_type*
 	_M_allocate_node(_Args&&... __args);
 
+      void*
+      _M_deallocate_nodes_next_func(void* ptr);
+
       void
       _M_deallocate_node(__node_type* __n);
 
@@ -2092,7 +2095,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   }
 
   template<typename _NodeAlloc>
-  void* _M_deallocate_nodes_next_func(void* ptr) {
+  void* _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes_next_func(void* ptr) {
       using __node_type = typename _NodeAlloc::value_type;
       __node_type* curr_node = (__node_type*)ptr;
       void* next_node = (void*)curr_node->_M_next();
@@ -2105,7 +2108,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     {
       printf("hacked dealloc nodes\n");
       fflush(stdout);
-      Chase((void*)__n, _M_deallocate_nodes_end_func, std::__detail::_M_deallocate_nodes_next_func, LOCAL);
+      Chase((void*)__n, _M_deallocate_nodes_end_func, _M_deallocate_nodes_next_func, LOCAL);
       // Original Code
       /*while (__n)
 	{

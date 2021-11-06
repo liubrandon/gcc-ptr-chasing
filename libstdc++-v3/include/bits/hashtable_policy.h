@@ -31,6 +31,7 @@
 #ifndef _HASHTABLE_POLICY_H
 #define _HASHTABLE_POLICY_H 1
 
+#include "/home/user/stdlibc++/pc/api/chase.h"
 #include <bits/stl_algobase.h> // for std::min.
 
 namespace std _GLIBCXX_VISIBILITY(default)
@@ -2086,18 +2087,32 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       __node_alloc_traits::deallocate(_M_node_allocator(), __ptr, 1);
     }
 
+  bool _M_deallocate_nodes_end_func(void* ptr) {
+      return ptr == NULL;
+  }
+
+  template<typename _NodeAlloc>
+  void* _M_deallocate_nodes_next_func(void* ptr) {
+      using __node_type = typename _NodeAlloc::value_type;
+      __node_type* curr_node = (__node_type*)ptr;
+      void* next_node = (void*)curr_node->_M_next();
+      _M_deallocate_node(curr_node);
+      return next_node;
+  }
   template<typename _NodeAlloc>
     void
     _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes(__node_type* __n)
     {
       printf("hacked dealloc nodes\n");
       fflush(stdout);
-      while (__n)
+      Chase((void*)__n, _M_deallocate_nodes_end_func, std::__detail::_M_deallocate_nodes_next_func, LOCAL);
+      // Original Code
+      /*while (__n)
 	{
 	  __node_type* __tmp = __n;
 	  __n = __n->_M_next();
 	  _M_deallocate_node(__tmp);
-	}
+	}*/
     }
 
   template<typename _NodeAlloc>

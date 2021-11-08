@@ -633,6 +633,11 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_bucket_index(const key_type& __k, __hash_code __c) const
       { return __hash_code_base::_M_bucket_index(__k, __c, _M_bucket_count); }
 
+      struct _M_find_before_node_end_arg {
+          _Hashtable* my_this;
+          key_type __k;
+          __hash_code __code;
+      };
       // Find and insert helper functions and types
       // Find the node before the one matching the criteria.
       __node_base*

@@ -2029,6 +2029,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_node_allocator()
       { return __ebo_node_alloc::_S_get(*this); }
 
+      static __node_alloc_type&
+      my_M_node_allocator(_Hashtable_alloc* my_this)
+      { return *my_this; }
+
       const __node_alloc_type&
       _M_node_allocator() const
       { return __ebo_node_alloc::_S_cget(*this); }
@@ -2037,11 +2041,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	__node_type*
 	_M_allocate_node(_Args&&... __args);
 
-      void*
-      _M_deallocate_nodes_next_func(void* ptr);
+      static void*
+      _M_deallocate_nodes_next_func(void* ptr, void* my_this);
 
       void
       _M_deallocate_node(__node_type* __n);
+
+      static void
+      my_M_deallocate_node(__node_type* __n, _Hashtable_alloc* my_this);
 
       // Deallocate the linked list of nodes pointed to by __n
       void
@@ -2090,16 +2097,28 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       __node_alloc_traits::deallocate(_M_node_allocator(), __ptr, 1);
     }
 
+  template<typename _NodeAlloc>
+    void
+    _Hashtable_alloc<_NodeAlloc>::my_M_deallocate_node(__node_type* __n, _Hashtable_alloc<_NodeAlloc>* my_this)
+    {
+      typedef typename __node_alloc_traits::pointer _Ptr;
+      auto __ptr = std::pointer_traits<_Ptr>::pointer_to(*__n);
+      __value_alloc_type __a(my_this->_M_node_allocator());
+      __value_alloc_traits::destroy(__a, __n->_M_valptr());
+      __n->~__node_type();
+      __node_alloc_traits::deallocate(my_this->_M_node_allocator(), __ptr, 1);
+    }
+
   bool _M_deallocate_nodes_end_func(void* ptr) {
       return ptr == NULL;
   }
 
   template<typename _NodeAlloc>
-  void* _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes_next_func(void* ptr) {
+  void* _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes_next_func(void* ptr, void* my_this) {
       using __node_type = typename _NodeAlloc::value_type;
       __node_type* curr_node = (__node_type*)ptr;
       void* next_node = (void*)curr_node->_M_next();
-      _M_deallocate_node(curr_node);
+      my_M_deallocate_node(curr_node, (_Hashtable_alloc<_NodeAlloc>*)my_this);
       return next_node;
   }
   template<typename _NodeAlloc>
@@ -2108,7 +2127,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     {
       printf("hacked dealloc nodes\n");
       fflush(stdout);
-      Chase((void*)__n, _M_deallocate_nodes_end_func, _M_deallocate_nodes_next_func, LOCAL);
+      Chase((void*)__n, _M_deallocate_nodes_end_func, _M_deallocate_nodes_next_func, LOCAL, this);
       // Original Code
       /*while (__n)
 	{

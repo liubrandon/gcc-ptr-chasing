@@ -638,6 +638,13 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
           key_type __k;
           __hash_code __code;
       };
+
+      static void*
+      _M_find_before_node_next_func(void* ptr, void* _);
+
+      static  bool
+      _M_find_before_node_end_func(void* ptr, void* end_arg);
+
       // Find and insert helper functions and types
       // Find the node before the one matching the criteria.
       __node_base*
@@ -1535,14 +1542,30 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       else
 	return std::make_pair(end(), end());
     }
-
-/*  void* next_func(void* ptr) {
+  template<typename _Key, typename _Value,
+	   typename _Alloc, typename _ExtractKey, typename _Equal,
+	   typename _H1, typename _H2, typename _Hash, typename _RehashPolicy,
+	   typename _Traits>
+  void*
+  _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,
+           _H1, _H2, _Hash, _RehashPolicy, _Traits>::
+  _M_find_before_node_next_func(void* ptr, void* _) {
   	return static_cast<__node_type*>(ptr)->_M_next();
   }
 
-  bool end_func(void* ptr) {
-  	if(_M_equals(__k, __code, __p)
-  }*/
+  template<typename _Key, typename _Value,
+	   typename _Alloc, typename _ExtractKey, typename _Equal,
+	   typename _H1, typename _H2, typename _Hash, typename _RehashPolicy,
+	   typename _Traits>
+  bool
+  _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,
+	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
+  _M_find_before_node_end_func(void* ptr, void* end_arg) {
+    struct _M_find_before_node_end_arg my_end_arg = (_M_find_before_node_end_arg*) end_arg;
+  	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, static_cast<__node_type*>(ptr)))
+      return true;
+    return false;
+  }
 
   // Find the node whose key compares equal to k in the bucket n.
   // Return nullptr if no node is found.

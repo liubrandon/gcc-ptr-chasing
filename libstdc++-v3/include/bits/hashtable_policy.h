@@ -2109,7 +2109,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       __node_alloc_traits::deallocate(my_this->_M_node_allocator(), __ptr, 1);
     }
 
-  bool _M_deallocate_nodes_end_func(void* ptr, void* _) {
+  bool _M_deallocate_nodes_end_func(void* ptr, void* _, int* __) {
       return ptr == NULL;
   }
 
@@ -2127,7 +2127,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     {
       printf("hacked dealloc nodes\n");
       fflush(stdout);
-      Chase((void*)__n, _M_deallocate_nodes_end_func, _M_deallocate_nodes_next_func, LOCAL, NULL, this);
+      Chase((void*)__n, _M_deallocate_nodes_end_func, _M_deallocate_nodes_next_func, LOCAL, NULL, this, NULL);
       // Original Code
       /*while (__n)
 	{

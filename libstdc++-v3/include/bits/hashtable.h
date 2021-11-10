@@ -32,6 +32,7 @@
 
 #pragma GCC system_header
 
+#include <iostream>
 #include "/home/user/stdlibc++/pc/api/chase.h"
 #include <bits/hashtable_policy.h>
 #if __cplusplus > 201402L
@@ -634,7 +635,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       { return __hash_code_base::_M_bucket_index(__k, __c, _M_bucket_count); }
 
       struct _M_find_before_node_end_arg {
-          const _Hashtable* my_this;
+          const _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>* my_this;
           key_type __k;
           __hash_code __code;
       };
@@ -643,7 +644,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_find_before_node_next_func(void* ptr, void* _);
 
       static  bool
-      _M_find_before_node_end_func(void* ptr, void* end_arg);
+      _M_find_before_node_end_func(void* ptr, void* end_arg, int* exit_code);
 
       // Find and insert helper functions and types
       // Find the node before the one matching the criteria.
@@ -1560,13 +1561,22 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   bool
   _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,
 	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
-  _M_find_before_node_end_func(void* ptr, void* end_arg) {
+  _M_find_before_node_end_func(void* ptr, void* end_arg, int* exit_code) {
     __node_type* __p = static_cast<__node_type*>(ptr);
-    if(!__p->_M_next())
-        return true; // TODO: return failure
-    struct _M_find_before_node_end_arg* my_end_arg = (_M_find_before_node_end_arg*) end_arg;
-  	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, __p->_M_next()));
-      return true;
+    if(!__p->_M_next()) {
+        printf("exhausted list"); fflush(stdout);
+        return true;
+    }
+    printf("made it here\n"); fflush(stdout);
+    struct _M_find_before_node_end_arg* my_end_arg = static_cast<struct M_find_before_node_end_arg*>(end_arg);
+
+    std::cout << "my code: " << my_end_arg->__code << std::endl;
+	std::cout << "my k   : " << my_end_arg->__k << std::endl;
+    fflush(stdout);
+  	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, __p->_M_next())) {
+        *exit_code = CHASE_SUCCESS;
+        return true;
+    }
     return false;
   }
 
@@ -1583,25 +1593,35 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-	    printf("__code as int   : %d\n", __code);
-	    printf("__k as    int   : %d\n", __k);
+        std::cout << "__code: :" << __code << std::endl;
+        std::cout << "__k     :" <<  __k << std::endl;
       		fflush(stdout);
 	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
 	    return nullptr;
+
       struct _M_find_before_node_end_arg end_arg;
       end_arg.my_this = this;
       end_arg.__k = __k;
       end_arg.__code = __code;
       __node_type* __p = static_cast<__node_type*>(__prev_p);
-      void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, (void*)this);
-      return (__node_base*)ptr;
-      /*
+      int exit_code = CHASE_FAILURE;
+      void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, (void*)this, &exit_code);
+      if (exit_code == CHASE_SUCCESS) {
+          printf("Success\n"); fflush(stdout);
+          return (__node_base*)ptr;
+      } else {
+          printf("failure\n"); fflush(stdout);
+          return nullptr;
+      }
+    /*
       for (__node_type* __p = static_cast<__node_type*>(__prev_p->_M_nxt);;
 	   __p = __p->_M_next())
 	{
-	  if (this->_M_equals(__k, __code, __p))
-	    return __prev_p;
+	  if (this->_M_equals(__k, __code, __p)) {
+	     printf("_M_equals returned true\n"); fflush(stdout);
+          return __prev_p;
+      }
 
 	  if (!__p->_M_nxt || _M_bucket_index(__p->_M_next()) != __n)
 	    break;

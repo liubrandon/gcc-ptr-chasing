@@ -634,7 +634,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       { return __hash_code_base::_M_bucket_index(__k, __c, _M_bucket_count); }
 
       struct _M_find_before_node_end_arg {
-          _Hashtable* my_this;
+          const _Hashtable* my_this;
           key_type __k;
           __hash_code __code;
       };
@@ -1561,8 +1561,11 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,
 	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
   _M_find_before_node_end_func(void* ptr, void* end_arg) {
-    struct _M_find_before_node_end_arg my_end_arg = (_M_find_before_node_end_arg*) end_arg;
-  	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, static_cast<__node_type*>(ptr)))
+    __node_type* __p = static_cast<__node_type*>(ptr);
+    if(!__p->_M_next())
+        return true; // TODO: return failure
+    struct _M_find_before_node_end_arg* my_end_arg = (_M_find_before_node_end_arg*) end_arg;
+  	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, __p->_M_next()));
       return true;
     return false;
   }
@@ -1585,8 +1588,15 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       		fflush(stdout);
 	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
-	return nullptr;
-
+	    return nullptr;
+      struct _M_find_before_node_end_arg end_arg;
+      end_arg.my_this = this;
+      end_arg.__k = __k;
+      end_arg.__code = __code;
+      __node_type* __p = static_cast<__node_type*>(__prev_p);
+      void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, (void*)this);
+      return (__node_base*)ptr;
+      /*
       for (__node_type* __p = static_cast<__node_type*>(__prev_p->_M_nxt);;
 	   __p = __p->_M_next())
 	{
@@ -1597,7 +1607,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	    break;
 	  __prev_p = __p;
 	}
-      return nullptr;
+      return nullptr;*/
     }
 
   template<typename _Key, typename _Value,

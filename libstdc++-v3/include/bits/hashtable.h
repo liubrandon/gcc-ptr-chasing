@@ -634,8 +634,13 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       _M_bucket_index(const key_type& __k, __hash_code __c) const
       { return __hash_code_base::_M_bucket_index(__k, __c, _M_bucket_count); }
 
+    	template<typename _Key_2, typename _Value_2, typename _Alloc_2,
+	   typename _ExtractKey_2, typename _Equal_2,
+	   typename _H1_2, typename _H2_2, typename _Hash_2,
+	   typename _RehashPolicy_2, typename _Traits_2>
       struct _M_find_before_node_end_arg {
-          const _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>* my_this;
+          const _Hashtable<_Key_2, _Value_2, _Alloc_2, _ExtractKey_2, _Equal_2, _H1_2, _H2_2, _Hash_2, _RehashPolicy_2, _Traits_2>* my_this;
+          size_type __n;
           key_type __k;
           __hash_code __code;
       };
@@ -1564,17 +1569,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
   _M_find_before_node_end_func(void* ptr, void* end_arg, int* exit_code) {
     __node_type* __p = static_cast<__node_type*>(ptr);
     if(!__p->_M_next()) {
-        printf("exhausted list"); fflush(stdout);
         return true;
     }
-    printf("made it here\n"); fflush(stdout);
-    struct _M_find_before_node_end_arg* my_end_arg = static_cast<struct M_find_before_node_end_arg*>(end_arg);
-
-    std::cout << "my code: " << my_end_arg->__code << std::endl;
-	std::cout << "my k   : " << my_end_arg->__k << std::endl;
+    struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>
+            * my_end_arg = (struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>*)(end_arg);
+    std::cout << "/#/ my code: " << my_end_arg->__code << std::endl;
+	std::cout << "/#/ my k   : " << my_end_arg->__k << std::endl;
     fflush(stdout);
   	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, __p->_M_next())) {
         *exit_code = CHASE_SUCCESS;
+        return true;
+    }
+    if (!__p->_M_next()->_M_next() || my_end_arg->my_this->_M_bucket_index(__p->_M_next()->_M_next()) != my_end_arg->__n) {
         return true;
     }
     return false;
@@ -1593,25 +1599,26 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-        std::cout << "__code: :" << __code << std::endl;
-        std::cout << "__k     :" <<  __k << std::endl;
+        std::cout << "/#/ __code: :" << __code << std::endl;
+        std::cout << "/#/ __k     :" <<  __k << std::endl;
       		fflush(stdout);
 	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
 	    return nullptr;
 
-      struct _M_find_before_node_end_arg end_arg;
+      struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits> end_arg;
       end_arg.my_this = this;
+      end_arg.__n = __n;
       end_arg.__k = __k;
       end_arg.__code = __code;
       __node_type* __p = static_cast<__node_type*>(__prev_p);
       int exit_code = CHASE_FAILURE;
-      void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, (void*)this, &exit_code);
+      void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, NULL, &exit_code);
       if (exit_code == CHASE_SUCCESS) {
-          printf("Success\n"); fflush(stdout);
+          printf("/#/ Success\n"); fflush(stdout);
           return (__node_base*)ptr;
       } else {
-          printf("failure\n"); fflush(stdout);
+          printf("/#/ failure\n"); fflush(stdout);
           return nullptr;
       }
     /*
@@ -1619,7 +1626,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	   __p = __p->_M_next())
 	{
 	  if (this->_M_equals(__k, __code, __p)) {
-	     printf("_M_equals returned true\n"); fflush(stdout);
           return __prev_p;
       }
 
@@ -2101,7 +2107,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
     clear() noexcept
     {
-      printf("hacked clear\n");
+      printf("/#/ hacked clear\n");
       fflush(stdout);
       this->_M_deallocate_nodes(_M_begin());
       __builtin_memset(_M_buckets, 0, _M_bucket_count * sizeof(__bucket_type));

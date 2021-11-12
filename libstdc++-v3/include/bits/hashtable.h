@@ -1573,8 +1573,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     }
     struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>
             * my_end_arg = (struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits>*)(end_arg);
-    std::cout << "/#/ my code: " << my_end_arg->__code << std::endl;
-	std::cout << "/#/ my k   : " << my_end_arg->__k << std::endl;
+    std::cout << "# my code: " << my_end_arg->__code << std::endl;
+	std::cout << "# my k   : " << my_end_arg->__k << std::endl;
     fflush(stdout);
   	if(my_end_arg->my_this->_M_equals(my_end_arg->__k, my_end_arg->__code, __p->_M_next())) {
         *exit_code = CHASE_SUCCESS;
@@ -1599,8 +1599,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 			__hash_code __code) const
     -> __node_base*
     {
-        std::cout << "/#/ __code: :" << __code << std::endl;
-        std::cout << "/#/ __k     :" <<  __k << std::endl;
+        std::cout << "# __code: :" << __code << std::endl;
+        std::cout << "# __k     :" <<  __k << std::endl;
       		fflush(stdout);
 	    __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
@@ -1615,10 +1615,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       int exit_code = CHASE_FAILURE;
       void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, LOCAL, (void*)&end_arg, NULL, &exit_code);
       if (exit_code == CHASE_SUCCESS) {
-          printf("/#/ Success\n"); fflush(stdout);
+          printf("# Success\n"); fflush(stdout);
           return (__node_base*)ptr;
       } else {
-          printf("/#/ failure\n"); fflush(stdout);
+          printf("# failure\n"); fflush(stdout);
           return nullptr;
       }
     /*
@@ -2107,7 +2107,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	       _H1, _H2, _Hash, _RehashPolicy, _Traits>::
     clear() noexcept
     {
-      printf("/#/ hacked clear\n");
+      printf("# hacked clear\n");
       fflush(stdout);
       this->_M_deallocate_nodes(_M_begin());
       __builtin_memset(_M_buckets, 0, _M_bucket_count * sizeof(__bucket_type));

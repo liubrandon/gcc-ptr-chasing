@@ -1605,10 +1605,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	  __node_base* __prev_p = _M_buckets[__n];
       if (!__prev_p)
 	    return nullptr;
-
+      int exit_code = CHASE_FAILURE;
       chase_args_t args;
       args.backend_type = LOCAL;
-      args.exit_code = CHASE_FAILURE;
+      args.exit_code = &exit_code;
       struct _M_find_before_node_end_arg<_Key, _Value, _Alloc, _ExtractKey, _Equal, _H1, _H2, _Hash, _RehashPolicy, _Traits> end_arg;
       end_arg.my_this = this;
       end_arg.__n = __n;
@@ -1616,7 +1616,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       end_arg.__code = __code;
       args.data = (void*)&end_arg;
       __node_type* __p = static_cast<__node_type*>(__prev_p);
-      int exit_code = CHASE_FAILURE;
       void* ptr = Chase((void*)__p, _M_find_before_node_end_func, _M_find_before_node_next_func, args);
       if (exit_code == CHASE_SUCCESS) {
           printf("# Success\n"); fflush(stdout);

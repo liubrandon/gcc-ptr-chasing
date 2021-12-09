@@ -2125,8 +2125,6 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     void
     _Hashtable_alloc<_NodeAlloc>::_M_deallocate_nodes(__node_type* __n)
     {
-      printf("# deallocate_nodes() called\n");
-      fflush(stdout);
       chase_args_t args;
       args.backend_type = LOCAL;
       args.data = (void*)this;
